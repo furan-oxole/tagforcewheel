@@ -1,35 +1,67 @@
-# Tag Force Wheel — mazzi aggiornati da GitHub
+# Tag Force Wheel
 
-## Prima configurazione (una sola volta)
+Sito statico di estrazione casuale per i mazzi Yu-Gi-Oh! Tag Force, pubblicabile tramite GitHub Pages.
 
-1. Copia tutti i file e le cartelle di questo pacchetto **nella cartella principale del repository GitHub** che pubblica il sito (sostituisci l'`index.html` precedente).
-2. Apri `config.json` su GitHub e cambia il valore `repository` nel formato `nomeutente/nomerepository` (esempio: `mario/tagforcewheel`). Non inserire un URL e non modificare le virgolette.
-3. Salva le modifiche (Commit changes). Il repository deve essere **pubblico**, e GitHub Pages deve essere configurato per pubblicare la cartella principale del ramo corretto.
+## Contenuto del repository
 
-## Aggiungere mazzi senza modificare il codice
-
-1. Apri su GitHub `mazzi/Tag Force 3/`.
-2. Seleziona **Add file → Upload files** e carica uno o più file `.ydk`.
-3. Salva con **Commit changes**. Alla prossima visita/ricarica, dopo la pubblicazione di GitHub Pages, i nuovi mazzi compariranno automaticamente nella ruota.
-
-Per altri giochi crea una cartella direttamente dentro `mazzi/`, per esempio:
-
-```
-index.html
-app.js
-config.json
+```text
+CNAME                 Dominio GitHub Pages già configurato
+index.html            Interfaccia e grafica
+app.js                Funzioni della slot, mazzi e carte
+config.json           Nome del repository GitHub pubblico
 mazzi/
-  Tag Force 1/
-    Jaden 01.ydk
-  Tag Force 2/
-    Jaden 01.ydk
   Tag Force 3/
     TF3 Jaden Yuki 01.ydk
     TF3 Jaden Yuki 02.ydk
-  Tag Force 4/
-    Yusei 01.ydk
 ```
 
-**Nota:** Il sito legge le cartelle usando l'API pubblica di GitHub, senza bisogno di GitHub Actions, server o aggiornamenti manuali di una lista. Ogni caricamento della pagina aggiorna l'elenco, ma la pubblicazione GitHub Pages può impiegare un po' dopo un commit. L'API pubblica di GitHub ha limiti d'uso, in particolare da indirizzi IP condivisi. I file `.ydk` e le immagini delle carte vengono caricati quando scegli un mazzo; le immagini provengono da YGOPRODeck e richiedono accesso a Internet. Con molti mazzi, la ruota rappresenta ogni mazzo con uno spicchio sottile e omette i nomi direttamente sulla ruota oltre 30 mazzi (restano selezionabili dall'elenco).
+`config.json` punta già a `furan-oxole/tagforcewheel`. Non modificare `CNAME` se vuoi mantenere il dominio attuale.
 
-**Formato:** sono supportati i file `.ydk` con sezioni `#main`, `#extra` e `!side` e ID numerici delle carte. I file in sottocartelle del gioco vengono rilevati, ma il nome del gioco è sempre quello della cartella immediatamente sotto `mazzi/`.
+## Aggiungere nuovi mazzi
+
+Inserisci file `.ydk` nelle cartelle sotto `mazzi/`, per esempio `mazzi/Tag Force 5/Nome Mazzo.ydk`, e salva il commit. Al successivo caricamento del sito la lista dei giochi e dei mazzi viene ricavata automaticamente dall'API pubblica di GitHub. Non è necessario modificare `app.js`, né mantenere manualmente un elenco di ricette.
+
+I file `.ydk` possono contenere le sezioni `#main`, `#extra` e `!side`. I mazzi vengono mostrati con il nome del file, senza l'estensione. Anche le sottocartelle interne a un gioco sono supportate.
+
+## Come funziona la slot
+
+- Vengono mostrati sempre cinque nomi, con quello centrale evidenziato.
+- Ogni volta che carichi un gioco, i mazzi attivi sono mescolati casualmente.
+- Premendo **GIRA**, il rullo mantiene inizialmente i nomi che si vedono e fa entrare una **nuova sequenza mescolata**.
+- Il rullo percorre **50 posizioni** in **5 secondi**, rallentando fino al centro. Ogni mazzo attivo ha la stessa probabilità di trovarsi sulla posizione finale, anche con centinaia di mazzi.
+- Le estrazioni sono indipendenti: lo stesso mazzo può uscire più volte.
+
+## Esclusioni personali
+
+Il pulsante **Gestisci mazzi** mostra l'elenco completo con ricerca e caselle per includere/escludere ogni mazzo. Dopo un'estrazione puoi anche usare **Escludi mazzo**. I mazzi esclusi restano nel repository, non entrano nelle estrazioni e possono essere ripristinati singolarmente o tutti insieme.
+
+Le esclusioni sono memorizzate nel `localStorage` di **quel browser e dispositivo**, per ciascun gioco. Non servono account; altri visitatori non vengono influenzati. Se si cancellano i dati del browser, le esclusioni vengono perse.
+
+## Ruota personalizzata
+
+Apri la scheda **Ruota personalizzata**, scrivi una frase per riga e premi **GIRA**. Ogni riga costituisce un'opzione e può essere estratta; il risultato mostra solo il testo, senza immagini di carte né download `.ydk`. La lista rimane salvata nel browser finché non vengono cancellati i dati del sito. Righe con testo identico sono considerate voci distinte.
+
+## Immagini e nomi delle carte
+
+La visualizzazione della ricetta è stata mantenuta: ogni copia viene mostrata separatamente, le immagini si possono ingrandire e si può scaricare il `.ydk` originale.
+
+Sotto ogni carta il sito cerca il nome in **italiano** e in **inglese** tramite l'API di YGOPRODeck, con richiesta solo per le carte effettivamente visualizzate. I nomi già recuperati sono memorizzati nel browser per limitare le richieste ripetute. Se manca un nome o il servizio non è disponibile, la carta rimane comunque visibile, con il nome conosciuto o l'ID.
+
+**Importante:** la raccolta locale delle immagini non fa ancora parte di questa versione. Le immagini sono tuttora caricate dai server di YGOPRODeck come nella versione originale. La documentazione ufficiale di YGOPRODeck chiede di scaricare e ospitare localmente le immagini per siti pubblici, anziché richiamarle ripetutamente dai propri server. Prima di pubblicizzare il sito su larga scala, sarà opportuno configurare l'archivio locale delle immagini e verificarne i diritti d'uso.
+
+## Provare il sito sul PC
+
+È necessario un piccolo server HTTP locale (aprire semplicemente `index.html` con `file://` può bloccare le richieste). Se hai Python:
+
+```bash
+python -m http.server 8000
+```
+
+Dalla cartella principale del sito, apri `http://localhost:8000` nel browser. Per caricare l'elenco dei mazzi, il browser deve comunque poter accedere all'API pubblica GitHub.
+
+## Limiti e note
+
+- GitHub applica limiti alle richieste API non autenticate. Il sito legge l'indice dei file all'avvio; numeri molto elevati di file nel repository possono richiedere un sistema di indicizzazione più robusto.
+- Le immagini possono mostrare ristampe e testi aggiornati rispetto ai giochi PSP.
+- I dati del `localStorage` non sono sincronizzati tra browser o dispositivi.
+- Il progetto è un fan site non ufficiale. Le immagini e i marchi sono proprietà dei rispettivi titolari.

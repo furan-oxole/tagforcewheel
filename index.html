@@ -1,5 +1,101 @@
-<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Estrai un mazzo di Yu-Gi-Oh! Tag Force e scarica il file YDK."><title>Tag Force Wheel</title><style>
-:root{color-scheme:dark;--bg:#111219;--panel:#1b1d28;--muted:#a5a7b9;--red:#ff654d;--gold:#ffd38b}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 20% 20%,#372028 0,transparent 50%),var(--bg);font:16px/1.5 system-ui,sans-serif;color:#f9f5ef}header,main,footer{max-width:1240px;margin:auto;padding:24px}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff15}.brand{font-weight:900;letter-spacing:-1px;font-size:23px}.brand span{color:var(--red)}.tag{font-size:11px;letter-spacing:2px;color:var(--muted)}h1{font-size:clamp(36px,5vw,65px);letter-spacing:-3px;line-height:1.04;margin:22px 0 15px}h1 em{color:var(--gold);font-style:normal}.intro{color:var(--muted);max-width:500px}.layout{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;padding:24px 0 40px}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700}.controls{display:flex;gap:12px;align-items:end;margin:28px 0 18px;flex-wrap:wrap}label{font-size:12px;color:var(--muted);display:grid;gap:7px}select,button{font:inherit;border:1px solid #ffffff25;border-radius:10px;padding:12px 16px;background:var(--panel);color:white}button{cursor:pointer;font-weight:700}button:hover{filter:brightness(1.13)}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:4px}button:disabled{opacity:.5;cursor:wait}.primary{background:var(--red);color:#1b1010;border-color:var(--red);padding:16px 28px;font-size:17px;width:100%}.wheelbox{max-width:460px;margin:auto;position:relative;padding:18px;width:100%}.pointer{position:absolute;top:0;left:calc(50% - 15px);border-left:15px solid transparent;border-right:15px solid transparent;border-top:31px solid var(--gold);z-index:2;filter:drop-shadow(0 3px 3px #000)}canvas{width:100%;display:block;filter:drop-shadow(0 18px 36px #0007)}.wheelcenter{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:6px solid #292632;border-radius:50%;background:var(--bg);width:93px;height:93px;display:grid;place-content:center;font-weight:900;text-align:center;font-size:18px;line-height:1.1;box-shadow:0 0 0 1px #ffffff33}.wheelcenter small{font-size:10px;color:var(--gold);letter-spacing:2px;margin-top:5px}.caption{text-align:center;color:var(--muted);font-size:12px}.result{border:1px solid #ffffff18;border-radius:20px;background:var(--panel);padding:26px}.resulthead{display:flex;justify-content:space-between;gap:20px;align-items:center;flex-wrap:wrap}h2{font-size:28px;letter-spacing:-1px;margin:6px 0}#stats{color:var(--muted);font-size:14px}.download{background:var(--gold);color:#22180e;border:0}.hint{color:var(--muted);font-size:13px;margin:22px 0}.grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:9px}.card{padding:0;border:0;background:none;border-radius:4px;position:relative;display:block;min-width:0}.card img{width:100%;display:block;border-radius:4px;aspect-ratio:421/614;object-fit:cover}.card .fallback{font-size:11px;display:grid;place-content:center;aspect-ratio:421/614;background:#453c42;border:1px solid #b69772;border-radius:5px;overflow-wrap:anywhere}h3{font-size:12px;letter-spacing:2px;margin:25px 0 12px;color:var(--muted)}.library{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.library button{font-size:13px}.library button[aria-pressed=true]{border-color:var(--red);color:var(--red)}footer{font-size:12px;color:var(--muted);padding-top:30px;padding-bottom:40px}footer a{color:var(--gold)}dialog{max-width:94vw;border:1px solid #ffffff30;border-radius:16px;background:#181a23;padding:15px;color:white}dialog::backdrop{background:#000b}dialog img{display:block;max-height:75vh;max-width:80vw;margin:12px auto}dialog button{display:block;margin-left:auto}#empty{text-align:center;padding:50px 15px;color:var(--muted)}@media(max-width:750px){header,main,footer{padding:18px}.layout{grid-template-columns:1fr;gap:16px}.wheelbox{max-width:350px}h1{letter-spacing:-2px}.result{padding:16px}.grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.tag{display:none}.download{width:100%}h2{font-size:24px}}
-
-#status{color:var(--muted);font-size:13px;margin:12px 0}.error{color:#ff9e91!important}.wheelbox.loading{opacity:.65}.controls select{max-width:290px}.repo-link{color:var(--gold)}.library{max-height:220px;overflow-y:auto}.card img{background:#302832}
-</style></head><body><header><div class="brand">TAG FORCE <span>WHEEL</span></div><div class="tag">SCEGLI IL GIOCO. LASCIA FARE AL CASO.</div></header><main><section class="layout"><div><div class="eyebrow">YU-GI-OH! · DECK RANDOMIZER</div><h1>Il tuo prossimo<br>mazzo? <em>Gira la ruota.</em></h1><p class="intro">Riscopri i mazzi di Tag Force. Estrai una ricetta, esplora le carte e portala nel tuo simulatore.</p><div class="controls"><label>GIOCO<select id="game" disabled><option>Caricamento...</option></select></label><span class="eyebrow" id="count"></span></div><button class="primary" id="spin" disabled>Caricamento mazzi...</button><p class="caption" id="caption">Ogni mazzo del gioco selezionato ha la stessa probabilità.</p><p id="status" role="status" aria-live="polite"></p></div><div><div class="wheelbox"><div class="pointer"></div><canvas width="900" height="900" id="wheel" role="img" aria-label="Ruota dei mazzi"></canvas><div class="wheelcenter">TAG<br>FORCE<small id="wheelgame">—</small></div></div></div></section><section class="result" aria-label="Mazzo estratto"><div id="empty">Seleziona un gioco e gira la ruota oppure scegli un mazzo qui sotto.</div><div id="chosen" hidden><div class="resulthead"><div><div class="eyebrow" id="resultLabel">IL TUO MAZZO</div><h2 id="deckname"></h2><div id="stats"></div></div><button class="download" id="download">↓ Scarica .ydk</button></div><p class="hint">Tocca una carta per ingrandirla. Le copie sono mostrate singolarmente nell'ordine del file originale.</p><div id="cards"></div></div><div class="library" id="recipes" aria-label="Esplora le ricette"></div></section><p id="announce" role="status" aria-live="polite"></p></main><footer>Progetto fan non ufficiale. Yu-Gi-Oh! e le immagini delle carte appartengono ai rispettivi titolari.<br>Immagini: <a href="https://ygoprodeck.com/" target="_blank" rel="noopener">YGOPRODeck</a> (possono mostrare ristampe e testi aggiornati). I mazzi sono letti dal repository GitHub pubblico.</footer><dialog id="zoom"><button id="close">Chiudi ✕</button><img id="big" alt=""><div id="cardname"></div></dialog><script src="app.js" defer></script></body></html>
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Estrai un mazzo Yu-Gi-Oh! Tag Force, oppure usa una lista personalizzata.">
+  <title>Tag Force Wheel</title>
+  <style>
+    :root{color-scheme:dark;--bg:#111219;--panel:#1b1d28;--panel2:#242735;--muted:#adb0c2;--red:#ff654d;--gold:#ffd38b;--line:#ffffff23}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 20% 10%,#372028 0,transparent 52%),var(--bg);font:16px/1.5 system-ui,sans-serif;color:#f9f5ef}
+    header,main,footer{max-width:1240px;margin:auto;padding:24px}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff15}.brand{font-weight:900;letter-spacing:-1px;font-size:23px}.brand span{color:var(--red)}.tag{font-size:11px;letter-spacing:2px;color:var(--muted)}
+    h1{font-size:clamp(35px,5vw,64px);letter-spacing:-2.5px;line-height:1.09;margin:20px 0 15px}h1 em{color:var(--gold);font-style:normal}.intro{color:var(--muted);max-width:520px}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:750}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:26px}.tabs button{background:transparent;border:1px solid var(--line)}.tabs button[aria-selected=true]{background:var(--gold);color:#21180e;border-color:var(--gold)}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px;align-items:center;padding:20px 0 38px}.controls{display:flex;gap:12px;align-items:end;margin:26px 0 18px;flex-wrap:wrap}label{font-size:12px;color:var(--muted);display:grid;gap:7px}
+    select,input,textarea,button{font:inherit;border:1px solid var(--line);border-radius:10px;padding:12px 16px;background:var(--panel);color:white}input,textarea{width:100%}textarea{min-height:185px;resize:vertical}button{cursor:pointer;font-weight:700}button:hover:not(:disabled){filter:brightness(1.12)}button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}button:disabled{opacity:.55;cursor:not-allowed}
+    .primary{background:var(--red);color:#1b1010;border-color:var(--red);padding:16px 28px;font-size:17px;width:100%}.secondary{background:var(--panel2)}.small{padding:9px 12px;font-size:13px}.caption{color:var(--muted);font-size:13px}.center{text-align:center}.error{color:#ff9e91!important}.helper{margin-top:18px}.status{color:var(--muted);font-size:13px;min-height:1.4em}
+    .reelbox{max-width:470px;width:100%;margin:auto;padding:24px;border-radius:24px;background:linear-gradient(135deg,#39303c,#171923 64%);border:2px solid #f0d6aa7d;box-shadow:0 20px 45px #0008;position:relative}.reel-head{font-weight:850;font-size:12px;text-align:center;color:var(--gold);letter-spacing:3px;margin:0 0 13px}
+    .reel-viewport{height:310px;overflow:hidden;position:relative;background:#11131b;border-radius:14px;border:1px solid #ffffff30;box-shadow:inset 0 0 32px #0009}.reel-viewport:before,.reel-viewport:after{content:"";position:absolute;left:0;right:0;height:55px;z-index:3;pointer-events:none}.reel-viewport:before{top:0;background:linear-gradient(#11131b,transparent)}.reel-viewport:after{bottom:0;background:linear-gradient(transparent,#11131b)}
+    .reel-strip{transform:translateY(0);will-change:transform}.reel-item{height:62px;display:flex;align-items:center;justify-content:center;padding:0 16px;text-align:center;border-bottom:1px solid #ffffff10;font-size:clamp(13px,1.6vw,17px);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reel-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .reel-target{position:absolute;top:124px;left:0;right:0;height:62px;border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);background:#ffd38b18;pointer-events:none;z-index:2}.reel-target:before,.reel-target:after{content:"";position:absolute;top:21px;border:9px solid transparent}.reel-target:before{left:-1px;border-left-color:var(--gold)}.reel-target:after{right:-1px;border-right-color:var(--gold)}
+    .reel-foot{text-align:center;margin-top:13px;font-size:12px;letter-spacing:2px;color:var(--muted)}.actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.actions>*{flex-shrink:0}
+    .result{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:26px;margin-bottom:18px}.resulthead{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}h2{font-size:28px;letter-spacing:-1px;margin:6px 0}#stats{color:var(--muted);font-size:14px}.download{background:var(--gold);color:#22180e;border:0}.hint{color:var(--muted);font-size:13px;margin:22px 0}
+    .grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px}.card{padding:0;border:0;background:transparent;border-radius:7px;display:flex;flex-direction:column;align-items:stretch;min-width:0;text-align:center;overflow:hidden}.card img{width:100%;display:block;border-radius:5px;aspect-ratio:421/614;object-fit:cover;background:#302832}.fallback{font-size:12px;display:grid;place-content:center;aspect-ratio:421/614;background:#453c42;border:1px solid #b69772;border-radius:5px;overflow-wrap:anywhere;padding:6px}.card-label{display:flex;flex-direction:column;gap:2px;padding:5px 1px 10px;font-weight:650;font-size:11px;line-height:1.25;overflow-wrap:anywhere}.card-en{color:var(--muted);font-weight:450}.card:hover .card-label{color:var(--gold)}h3{font-size:12px;letter-spacing:2px;margin:25px 0 12px;color:var(--muted)}
+    .library{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;max-height:250px;overflow-y:auto}.library button{font-size:13px}.library button[aria-pressed=true]{border-color:var(--red);color:var(--red)}.library button:disabled{opacity:.4}
+    .custom-input{margin:24px 0 16px;max-width:520px}.custom-input textarea{margin:0 0 5px}.custom-result{text-align:center;padding:30px 20px}.custom-result h2{color:var(--gold);overflow-wrap:anywhere;font-size:clamp(24px,4vw,36px)}
+    footer{font-size:12px;color:var(--muted);padding-top:30px;padding-bottom:40px}footer a{color:var(--gold)}
+    dialog{width:min(720px,94vw);max-height:90vh;overflow:auto;border:1px solid #ffffff30;border-radius:16px;background:#181a23;padding:20px;color:white}dialog::backdrop{background:#000c}dialog .modalhead{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:14px}dialog h2{margin:0;font-size:23px}dialog img{display:block;max-height:68vh;max-width:100%;margin:12px auto}dialog .modalhead button{font-size:13px}
+    .manage-list{max-height:52vh;overflow-y:auto;display:grid;gap:6px;margin:16px 0}.manage-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:9px;background:var(--panel2);font-size:14px}.manage-row input{width:19px;height:19px;accent-color:var(--gold);flex-shrink:0}.manage-row .name{flex:1;min-width:0;overflow-wrap:anywhere}.manage-row .state{color:var(--muted);font-size:12px}#empty{text-align:center;padding:40px 15px;color:var(--muted)}[hidden]{display:none!important}
+    @media(max-width:800px){.layout{grid-template-columns:1fr;gap:24px}.reelbox{max-width:490px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+    @media(max-width:540px){header,main,footer{padding:17px}.tag{display:none}.result{padding:16px}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.card-label{font-size:10px}.download{width:100%}.resulthead .actions{width:100%}.resulthead .actions button{flex:1}h2{font-size:24px}.reelbox{padding:15px}.reel-item{font-size:14px}.tabs button{flex:1;padding:10px}.controls select{max-width:calc(100vw - 36px)}}
+  </style>
+</head>
+<body>
+<header><div class="brand">TAG FORCE <span>WHEEL</span></div><div class="tag">SCEGLI. GIRA. SCOPRI.</div></header>
+<main>
+  <nav class="tabs" aria-label="Modalità ruota">
+    <button id="tab-main" aria-selected="true" type="button">Tag Force</button>
+    <button id="tab-custom" aria-selected="false" type="button">Ruota personalizzata</button>
+  </nav>
+  <section class="layout">
+    <div>
+      <div class="eyebrow" id="mode-heading">YU-GI-OH! · DECK RANDOMIZER</div>
+      <h1 id="headline">Il tuo prossimo<br>mazzo? <em>Gira la slot.</em></h1>
+      <p class="intro" id="introduction">Estrai un mazzo dai giochi Tag Force, guarda le carte e scarica la ricetta.</p>
+      <div id="main-controls">
+        <div class="controls">
+          <label>GIOCO<select id="game" disabled><option>Caricamento...</option></select></label>
+          <button type="button" class="secondary small" id="manage">Gestisci mazzi</button>
+          <span class="eyebrow" id="count"></span>
+        </div>
+      </div>
+      <div id="custom-controls" hidden>
+        <label class="custom-input">ELEMENTI DELLA LISTA (UNO PER RIGA)
+          <textarea id="custom-list" spellcheck="false" placeholder="Mazzo Drago Bianco&#10;Mazzo Zombie&#10;Mazzo Cyber Drago"></textarea>
+          <span class="caption" id="custom-count">0 elementi · La lista viene salvata automaticamente in questo browser.</span>
+        </label>
+      </div>
+      <button class="primary" id="spin" disabled>Caricamento mazzi...</button>
+      <p class="caption center" id="caption">Ogni elemento disponibile ha la stessa probabilità.</p>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </div>
+    <div>
+      <div class="reelbox" aria-label="Slot a un rullo verticale">
+        <p class="reel-head" id="reel-head">TAG FORCE</p>
+        <div class="reel-viewport"><div class="reel-strip" id="reel"></div><div class="reel-target"></div></div>
+        <div class="reel-foot">5 NOMI VISIBILI · 50 POSIZIONI PER GIRO</div>
+      </div>
+    </div>
+  </section>
+  <section class="result" id="main-result" aria-label="Mazzo estratto">
+    <div id="empty">Seleziona un gioco e premi GIRA oppure scegli un mazzo nell'elenco qui sotto.</div>
+    <div id="chosen" hidden>
+      <div class="resulthead">
+        <div><div class="eyebrow" id="resultLabel">IL TUO MAZZO</div><h2 id="deckname"></h2><div id="stats"></div></div>
+        <div class="actions"><button type="button" id="exclude-selected" class="secondary small">Escludi mazzo</button><button type="button" class="download" id="download">↓ Scarica .ydk</button></div>
+      </div>
+      <p class="hint">Tocca una carta per ingrandirla. Sotto ogni carta trovi il nome italiano e quello inglese, quando disponibili. Le copie rimangono separate.</p>
+      <div id="cards"></div>
+    </div>
+    <h3 id="browse-heading">ELENCO MAZZI</h3>
+    <div class="library" id="recipes" aria-label="Elenco mazzi disponibili"></div>
+  </section>
+  <section class="result custom-result" id="custom-result" hidden aria-live="polite">
+    <div class="eyebrow" id="custom-result-label">ELEMENTO ESTRATTO</div>
+    <h2 id="custom-choice">Inserisci almeno un nome per iniziare.</h2>
+  </section>
+  <p id="announce" class="status" role="status" aria-live="polite"></p>
+</main>
+<footer>Progetto fan non ufficiale. Yu-Gi-Oh! e le immagini delle carte appartengono ai rispettivi titolari. Le immagini delle carte, nella versione attuale, provengono da <a href="https://ygoprodeck.com/" target="_blank" rel="noopener">YGOPRODeck</a> (possibili ristampe e testi aggiornati). I file .ydk sono letti dal repository GitHub pubblico.</footer>
+<dialog id="zoom"><div class="modalhead"><strong>Dettaglio carta</strong><button type="button" id="close">Chiudi ✕</button></div><img id="big" alt=""><p id="cardname" class="center"></p></dialog>
+<dialog id="manage-dialog" aria-labelledby="manage-title">
+  <div class="modalhead"><h2 id="manage-title">Gestisci mazzi</h2><button type="button" id="close-manage">Chiudi ✕</button></div>
+  <p class="caption">Deseleziona un mazzo per escluderlo dalle estrazioni. Puoi ripristinarlo in qualsiasi momento.</p>
+  <input type="search" id="manage-search" placeholder="Cerca per nome..." aria-label="Cerca un mazzo">
+  <p class="caption" id="manage-count"></p>
+  <div id="manage-list" class="manage-list"></div>
+  <button type="button" class="secondary small" id="restore-all">Ripristina tutti i mazzi</button>
+</dialog>
+<script src="app.js" defer></script>
+</body>
+</html>
