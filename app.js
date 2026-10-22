@@ -1,7 +1,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const ROW_HEIGHT=62, SPIN_STEPS=50, SPIN_DURATION=5000, BROWSE_PAGE_SIZE=50;
-const CARD_IMAGE_EXTENSIONS=['jpg','webp','png','jpeg'];
+const CARD_IMAGE_EXTENSIONS=['webp','jpg','png','jpeg'];
 const STORAGE_EXCLUSIONS='tagforcewheel.exclusions.v1';
 const STORAGE_CUSTOM='tagforcewheel.custom.v1';
 const STORAGE_NAMES='tagforcewheel.cardNames.v1';
@@ -215,11 +215,18 @@ function renderManage(){
  $('restore-all').disabled=!all.some(isExcluded);
 }
 
-function imageURL(id,extension='jpg'){return `Carte/${encodeURIComponent(id)}.${extension}`}
+// Gli ID nei file .ydk sono numerici: gli zeri iniziali non compaiono nei nomi delle immagini.
+function normalizedCardId(id){return String(id).replace(/^0+(?=\d)/,'')}
+function imageURL(id,extension='webp'){
+ const key=normalizedCardId(id);
+ if(!/^[1-9]\d*$/.test(key))return null;
+ return `Carte/${key[0]}/${encodeURIComponent(key)}.${extension}`;
+}
 function loadLocalCardImage(img,id,onMissing){
- const key=String(id),saved=resolvedImages.get(key);
+ const key=normalizedCardId(id),saved=resolvedImages.get(key);
  if(missingImages.has(key)){onMissing();return}
- const paths=saved?[saved]:CARD_IMAGE_EXTENSIONS.map(ext=>imageURL(key,ext));
+ const paths=saved?[saved]:CARD_IMAGE_EXTENSIONS.map(ext=>imageURL(key,ext)).filter(Boolean);
+ if(!paths.length){missingImages.add(key);onMissing();return}
  let index=0;
  img.onload=()=>{resolvedImages.set(key,paths[index]);img.onerror=null};
  img.onerror=()=>{index++;if(index<paths.length)img.src=paths[index];else{missingImages.add(key);onMissing()}};
@@ -262,7 +269,7 @@ async function showDeck(d,random=false){
     setCardLabels(id,it,en);labels.push({id,it,en});
     b.append(im,caption);b.onclick=()=>{
      activeZoomID=id;
-     const path=resolvedImages.get(id);
+     const path=resolvedImages.get(normalizedCardId(id));
      $('big').hidden=!path;
      if(path)$('big').src=path;else $('big').removeAttribute('src');
      refreshZoomName(id);$('zoom').showModal()

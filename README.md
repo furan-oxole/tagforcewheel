@@ -9,7 +9,7 @@ CNAME                 Dominio GitHub Pages già configurato
 index.html            Interfaccia e grafica
 app.js                Funzioni della slot, mazzi e carte
 config.json           Nome del repository GitHub pubblico
-Carte/                Immagini carte locali per ID, da aggiungere in seguito
+Carte/1/ ... Carte/9/ Immagini carte locali raggruppate per prima cifra dell’ID
 mazzi/
   Tag Force 3/
     TF3 Jaden Yuki 01.ydk
@@ -48,22 +48,24 @@ Apri la scheda **Ruota personalizzata**, scrivi una frase per riga e premi **GIR
 
 ## Immagini locali e nomi delle carte
 
-**Tutte le immagini delle carte vengono cercate esclusivamente nella cartella `Carte/` del repository.** Nessuna richiesta di immagini viene inviata a YGOPRODeck o ad altri server esterni. La cartella è volutamente vuota (contiene solo `.gitkeep`) e puoi riempirla in un secondo momento.
+**Le immagini delle carte vengono cercate esclusivamente nelle sottocartelle numerate `Carte/1/` fino a `Carte/9/`.** Nessuna immagine viene richiesta a YGOPRODeck o ad altri server esterni. Le cartelle sono inizialmente vuote (contengono solo `.gitkeep`), così puoi riempirle in seguito.
 
-Per ciascun ID numerico presente nei `.ydk`, il sito cerca, nell'ordine:
+Il sito legge il numero ID nel file `.ydk`, elimina eventuali zeri iniziali e usa la **prima cifra rimanente** per determinare la cartella, senza cercare o scansionare tutti i file.
+
+Per esempio:
 
 ```text
-Carte/70828913.jpg
-Carte/70828913.webp
-Carte/70828913.png
-Carte/70828913.jpeg
+ID 10104880      -> Carte/1/10104880.webp
+ID 70828913      -> Carte/7/70828913.webp
+ID 27551         -> Carte/2/27551.webp
+ID 00027551      -> Carte/2/27551.webp
 ```
 
-Carica quindi le immagini col **nome esatto dell'ID numerico**: per esempio `Carte/70828913.jpg` per la carta `70828913`. Le estensioni sono minuscole e la cartella deve chiamarsi **`Carte`** con C maiuscola: GitHub Pages distingue maiuscole/minuscole. La stessa immagine locale viene utilizzata nella miniatura e nella finestra di ingrandimento; usa direttamente una versione HD se vuoi poter leggere il testo ingrandito.
+Sono supportati, nell'ordine, i file **`.webp`, `.jpg`, `.png`, `.jpeg`**, sempre con nome numerico uguale all'ID *senza zeri iniziali*. Poiché il tuo archivio è in WebP, il sito verifica prima questo formato. Le estensioni devono essere minuscole e la cartella deve chiamarsi **`Carte`** con C maiuscola: GitHub Pages distingue maiuscole/minuscole. Gli ID dei mazzi non vengono modificati. Gli ID costituiti soltanto da zero non hanno una cartella valida e mostrano il segnaposto.
 
-Finché un'immagine non viene aggiunta, al suo posto compare un segnaposto con l'ID. Un'immagine assente non impedisce la visualizzazione del mazzo né il download del `.ydk`. Le carte alternative o esclusive devono avere un'immagine corrispondente al loro specifico ID usato nel file `.ydk`.
+Finché un'immagine non viene aggiunta, al suo posto compare un segnaposto con l'ID. Un'immagine assente non impedisce la visualizzazione del mazzo né il download del `.ydk`. Le immagini sono usate per le miniature e per l'eventuale ingrandimento; una miniatura da 120 px non permette di leggere gli effetti delle carte.
 
-**Nota distinta sulle traduzioni:** i nomi italiano e inglese sono ancora cercati attraverso l'API testuale di YGOPRODeck (e memorizzati nel browser); **non** vengono scaricate immagini da tale servizio. Se desidererai eliminare anche la dipendenza per i nomi, servirà in futuro un indice locale delle traduzioni. Se il servizio nomi è indisponibile, immagini e download continuano a funzionare.
+**Nota sulle traduzioni:** i nomi italiano e inglese vengono ancora cercati attraverso l'API *testuale* di YGOPRODeck (e memorizzati nel browser); **non** vengono scaricate immagini da tale servizio. Se il servizio non risponde, immagini e download continuano a funzionare. Le carte esclusive possono non avere traduzioni.
 
 Le immagini e i marchi appartengono ai rispettivi titolari; verifica i diritti prima di redistribuire un archivio di carte pubblicamente.
 
