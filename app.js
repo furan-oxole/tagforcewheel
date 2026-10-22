@@ -1,12 +1,15 @@
 'use strict';
 const $=id=>document.getElementById(id);
-const ROW_HEIGHT=62, SPIN_STEPS=50, SPIN_DURATION=5000;
+const ROW_HEIGHT=62, SPIN_STEPS=50, SPIN_DURATION=5000, BROWSE_PAGE_SIZE=50;
+const CARD_IMAGE_EXTENSIONS=['jpg','webp','png','jpeg'];
 const STORAGE_EXCLUSIONS='tagforcewheel.exclusions.v1';
 const STORAGE_CUSTOM='tagforcewheel.custom.v1';
 const STORAGE_NAMES='tagforcewheel.cardNames.v1';
 let games=new Map(),gameName='',mode='main',spinning=false,selected=null,repo='';
 let visible=[],reelPool=[],exclusions=readJSON(STORAGE_EXCLUSIONS,{}),cardNames=readJSON(STORAGE_NAMES,{});
 let namesSaveTimer=null,manageRenderTimer=null,apiQueue=Promise.resolve();
+let browseGame='',browsePage=0,view='home',activeZoomID='';
+const resolvedImages=new Map(),missingImages=new Set();
 
 function readJSON(key,fallback){try{const raw=localStorage.getItem(key);return raw===null?fallback:JSON.parse(raw)}catch{return fallback}}
 function saveJSON(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
@@ -23,8 +26,8 @@ function randomInt(n){
 }
 function shuffled(list){const a=[...list];for(let i=a.length-1;i>0;i--){const j=randomInt(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function getAllDecks(){return games.get(gameName)||[]}
-function excludedForGame(){if(!Array.isArray(exclusions[gameName]))exclusions[gameName]=[];return exclusions[gameName]}
-function isExcluded(d){return excludedForGame().includes(d.path)}
+function excludedForGame(name=gameName){if(!Array.isArray(exclusions[name]))exclusions[name]=[];return exclusions[name]}
+function isExcluded(d,name=gameName){return excludedForGame(name).includes(d.path)}
 function eligible(){return getAllDecks().filter(d=>!isExcluded(d))}
 function getItems(){return mode==='main'?eligible():getCustomItems()}
 function getCustomItems(){return $('custom-list').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map((name,i)=>({name,path:`custom:${i}`}))}
@@ -69,18 +72,59 @@ function updateCount(){
 }
 function formatProbability(n){return (100/n).toLocaleString('it-IT',{maximumFractionDigits:2})}
 function rebuildReel(){resetReel(shuffled(getItems()));updateCount()}
-function updateLibrary(){
- const fragment=document.createDocumentFragment();
- for(const d of getAllDecks()){
-  const b=document.createElement('button');b.type='button';b.textContent=d.name;b.setAttribute('aria-pressed',String(d===selected));
-  const off=isExcluded(d);b.disabled=off||spinning;b.title=off?'Mazzo escluso: ripristinalo da Gestisci mazzi':d.name;
-  b.onclick=()=>{if(!spinning)showDeck(d,false)};fragment.append(b);
- }
- $('recipes').replaceChildren(fragment);
+function setPage(next,changeURL=true){
+ if(next==='browse'&&spinning)return;
+ view=next==='browse'?'browse':'home';
+ $('home-page').hidden=view!=='home';$('browse-page').hidden=view!=='browse';
+ $('nav-home').setAttribute('aria-current',view==='home'?'page':'false');
+ $('nav-browse').setAttribute('aria-current',view==='browse'?'page':'false');
+ if(view==='browse')renderBrowse();
+ if(changeURL){const target=view==='browse'?'#elenco':'#home';if(location.hash!==target)location.hash=target;}
+ window.scrollTo(0,0);
 }
+function setBrowseGame(name){browseGame=name;browsePage=0;$('browse-search').value='';renderBrowse()}
+function renderBrowse(){
+ if(!browseGame||!games.has(browseGame))browseGame=[...games.keys()][0]||'';
+ const gamefrag=document.createDocumentFragment();
+ for(const name of games.keys()){
+  const button=document.createElement('button');button.type='button';button.textContent=name;
+  button.setAttribute('aria-pressed',String(name===browseGame));button.onclick=()=>setBrowseGame(name);
+  gamefrag.append(button);
+ }
+ $('browse-games').replaceChildren(gamefrag);
+ const query=$('browse-search').value.trim().toLocaleLowerCase('it');
+ const items=(games.get(browseGame)||[]).filter(d=>d.name.toLocaleLowerCase('it').includes(query));
+ const pages=Math.max(1,Math.ceil(items.length/BROWSE_PAGE_SIZE));browsePage=Math.min(browsePage,pages-1);
+ const from=browsePage*BROWSE_PAGE_SIZE;
+ const frag=document.createDocumentFragment();
+ for(const d of items.slice(from,from+BROWSE_PAGE_SIZE)){
+  const button=document.createElement('button');button.type='button';button.className='browse-entry';
+  const title=document.createElement('span');title.className='deck-title';title.textContent=d.name;
+  const state=document.createElement('span');state.className='deck-state';state.textContent=isExcluded(d,browseGame)?'ESCLUSO':'Apri →';
+  button.append(title,state);button.onclick=()=>openBrowseDeck(d);frag.append(button);
+ }
+ if(!items.length){const empty=document.createElement('p');empty.className='browse-empty';empty.textContent='Nessun mazzo trovato.';frag.append(empty)}
+ $('browse-list').replaceChildren(frag);
+ $('browse-count').textContent=`${items.length} mazzi trovati${items.length?' · '+(from+1)+'–'+Math.min(from+BROWSE_PAGE_SIZE,items.length)+' visualizzati':''}`;
+ $('browse-page-info').textContent=`Pagina ${browsePage+1} di ${pages}`;
+ $('browse-prev').disabled=browsePage===0;$('browse-next').disabled=browsePage>=pages-1;
+}
+function openBrowseDeck(d){
+ if(spinning)return;
+ if(gameName!==browseGame){$('game').value=browseGame;setGame(browseGame)}
+ if(mode!=='main')setMode('main');
+ setPage('home');showDeck(d,false);
+ $('main-result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('nav-home').onclick=()=>setPage('home');
+$('nav-browse').onclick=()=>setPage('browse');
+$('browse-search').addEventListener('input',()=>{browsePage=0;renderBrowse()});
+$('browse-prev').onclick=()=>{if(browsePage>0){browsePage--;renderBrowse();window.scrollTo(0,0)}};
+$('browse-next').onclick=()=>{browsePage++;renderBrowse();window.scrollTo(0,0)};
+window.addEventListener('hashchange',()=>{const target=location.hash==='#elenco'?'browse':'home';if(target!==view)setPage(target,false)});
 function setGame(name){
  gameName=name;selected=null;$('chosen').hidden=true;$('empty').hidden=false;
- if(mode==='main')$('reel-head').textContent=name.toUpperCase();updateLibrary();rebuildReel();
+ if(mode==='main')$('reel-head').textContent=name.toUpperCase();rebuildReel();
 }
 function setMode(next){
  if(spinning||mode===next)return;
@@ -109,7 +153,6 @@ function spin(){
  spinning=true;$('spin').disabled=true;$('spin').textContent='Il rullo sta girando…';
  $('game').disabled=true;$('custom-list').disabled=true;$('manage').disabled=true;
  $('tab-main').disabled=true;$('tab-custom').disabled=true;
- for(const b of $('recipes').children)b.disabled=true;
  setStatus('');$('announce').textContent='';
  const pool=shuffled(list);
  // Keep the five current labels on screen. New randomized labels enter from below as scrolling starts.
@@ -127,7 +170,7 @@ function spin(){
    $('custom-result-label').textContent='ELEMENTO ESTRATTO';$('custom-choice').textContent=winner.name;
    $('announce').textContent=`Elemento estratto: ${winner.name}`;
   }else{
-   showDeck(winner,true);updateLibrary();
+   showDeck(winner,true);
   }
   updateCount();
  };
@@ -145,7 +188,8 @@ $('spin').onclick=spin;
 function setExcluded(d,excluded){
  const set=new Set(excludedForGame());if(excluded)set.add(d.path);else set.delete(d.path);
  exclusions[gameName]=[...set];saveJSON(STORAGE_EXCLUSIONS,exclusions);
- if(mode==='main'&&!spinning){rebuildReel();updateLibrary()}
+ if(mode==='main'&&!spinning)rebuildReel();
+ if(view==='browse')renderBrowse();
  if(selected===d){$('exclude-selected').textContent=excluded?'Ripristina mazzo':'Escludi mazzo'}
  if($('manage-dialog').open)renderManage();
 }
@@ -154,7 +198,7 @@ $('manage').onclick=()=>{if(spinning)return;$('manage-search').value='';renderMa
 $('close-manage').onclick=()=>$('manage-dialog').close();
 $('manage-dialog').addEventListener('click',e=>{if(e.target===$('manage-dialog'))$('manage-dialog').close()});
 $('manage-search').addEventListener('input',()=>{clearTimeout(manageRenderTimer);manageRenderTimer=setTimeout(renderManage,75)});
-$('restore-all').onclick=()=>{if(spinning)return;exclusions[gameName]=[];saveJSON(STORAGE_EXCLUSIONS,exclusions);rebuildReel();updateLibrary();if(selected)$('exclude-selected').textContent='Escludi mazzo';renderManage()};
+$('restore-all').onclick=()=>{if(spinning)return;exclusions[gameName]=[];saveJSON(STORAGE_EXCLUSIONS,exclusions);rebuildReel();if(view==='browse')renderBrowse();if(selected)$('exclude-selected').textContent='Escludi mazzo';renderManage()};
 function renderManage(){
  const all=getAllDecks(),q=$('manage-search').value.trim().toLocaleLowerCase('it');
  const frag=document.createDocumentFragment();let matches=0;
@@ -171,7 +215,16 @@ function renderManage(){
  $('restore-all').disabled=!all.some(isExcluded);
 }
 
-function imageURL(id,large=false){return `https://images.ygoprodeck.com/images/${large?'cards':'cards_small'}/${encodeURIComponent(id)}.jpg`}
+function imageURL(id,extension='jpg'){return `Carte/${encodeURIComponent(id)}.${extension}`}
+function loadLocalCardImage(img,id,onMissing){
+ const key=String(id),saved=resolvedImages.get(key);
+ if(missingImages.has(key)){onMissing();return}
+ const paths=saved?[saved]:CARD_IMAGE_EXTENSIONS.map(ext=>imageURL(key,ext));
+ let index=0;
+ img.onload=()=>{resolvedImages.set(key,paths[index]);img.onerror=null};
+ img.onerror=()=>{index++;if(index<paths.length)img.src=paths[index];else{missingImages.add(key);onMissing()}};
+ img.src=paths[0];
+}
 function infoText(id){
  const info=cardNames[id];if(!info)return {it:'',en:`Carta ${id}`};
  return {it:info.it||'',en:info.en||`Carta ${id}`};
@@ -192,7 +245,6 @@ async function showDeck(d,random=false){
  $('resultLabel').textContent=random?'IL RULLO HA SCELTO':'RICETTA SELEZIONATA';
  $('exclude-selected').textContent=isExcluded(d)?'Ripristina mazzo':'Escludi mazzo';
  $('stats').textContent='Caricamento delle carte...';$('cards').replaceChildren();$('download').disabled=true;
- for(let i=0;i<$('recipes').children.length;i++)$('recipes').children[i].setAttribute('aria-pressed',String(getAllDecks()[i]===d));
  try{
   const data=await fetchDeck(d);if(selected!==d||mode!=='main')return;
   $('stats').textContent=`Main Deck: ${data.main.length} · Extra Deck: ${data.extra.length} · Side Deck: ${data.side.length}`;
@@ -203,12 +255,18 @@ async function showDeck(d,random=false){
    const grid=document.createElement('div');grid.className='grid';
    for(const id of data[section]){
     const b=document.createElement('button');b.type='button';b.className='card';b.setAttribute('aria-label',`Ingrandisci carta ${id}`);
-    const im=document.createElement('img');im.loading='lazy';im.src=imageURL(id);im.alt=`Carta ${id}`;
-    im.onerror=()=>{const fallback=document.createElement('span');fallback.className='fallback';fallback.textContent=`Immagine non disponibile · ${id}`;im.replaceWith(fallback)};
+    const im=document.createElement('img');im.loading='lazy';im.alt=`Carta ${id}`;
+    loadLocalCardImage(im,id,()=>{const fallback=document.createElement('span');fallback.className='fallback';fallback.textContent=`Immagine non ancora presente in Carte/ · ${id}`;if(im.isConnected)im.replaceWith(fallback);});
     const caption=document.createElement('span');caption.className='card-label';
     const it=document.createElement('span');const en=document.createElement('span');en.className='card-en';caption.append(it,en);
     setCardLabels(id,it,en);labels.push({id,it,en});
-    b.append(im,caption);b.onclick=()=>{$('big').src=imageURL(id,true);refreshZoomName(id);$('zoom').showModal()};grid.append(b);
+    b.append(im,caption);b.onclick=()=>{
+     activeZoomID=id;
+     const path=resolvedImages.get(id);
+     $('big').hidden=!path;
+     if(path)$('big').src=path;else $('big').removeAttribute('src');
+     refreshZoomName(id);$('zoom').showModal()
+    };grid.append(b);
    }
    $('cards').append(grid);
   }
@@ -262,7 +320,7 @@ async function hydrateCardNames(labels){
  }
  await Promise.allSettled([load(missingEn,'en'),load(missingIt,'it')]);
  for(const item of labels)setCardLabels(item.id,item.it,item.en);
- if($('zoom').open){const id=$('big').src.match(/\/(\d+)\.jpg(?:\?|$)/)?.[1];if(id)refreshZoomName(id)}
+ if($('zoom').open&&activeZoomID)refreshZoomName(activeZoomID)
 }
 $('download').onclick=async()=>{
  if(!selected)return;const d=selected;
@@ -294,9 +352,10 @@ async function init(){
   const ordered=[...games.keys()].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
   $('game').replaceChildren();for(const g of ordered){games.get(g).sort((a,b)=>a.name.localeCompare(b.name,'it',{numeric:true}));$('game').add(new Option(g,g))}
   if(!ordered.length){$('game').add(new Option('Nessun mazzo trovato',''));throw Error('Nessun file .ydk trovato nelle cartelle mazzi/')} 
-  $('game').disabled=false;setGame(ordered[0]);setStatus(`Caricati ${entries.length} mazzi da ${ordered.length} giochi.`);
+  $('game').disabled=false;setGame(ordered[0]);browseGame=ordered[0];renderBrowse();setStatus(`Caricati ${entries.length} mazzi da ${ordered.length} giochi.`);
  }catch(err){setStatus(err.message,true);$('game').disabled=true;if(mode==='main'){$('spin').disabled=true;$('spin').textContent='Configurazione richiesta'}}
 }
 // Display custom mode even before GitHub loads, without relying on GitHub API.
 updateCount();
+setPage(location.hash==='#elenco'?'browse':'home',false);
 init();
