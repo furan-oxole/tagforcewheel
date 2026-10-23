@@ -1,1 +1,0 @@
-Archivi temporanei delle immagini.
