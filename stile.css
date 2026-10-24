@@ -1,0 +1,759 @@
+/* STILE DEL SITO
+   Cambia qui colori, caratteri, misure e disposizione degli elementi.
+   La logica della ruota e dei mazzi si trova in app.js.
+*/
+
+
+/* 1. COLORI PRINCIPALI: modifica le variabili --bg, --red, --gold ecc. */
+:root {
+  color-scheme: dark;
+  --bg: #111219;
+  --panel: #1b1d28;
+  --panel2: #242735;
+  --muted: #adb0c2;
+  --red: #ff654d;
+  --gold: #ffd38b;
+  --line: #ffffff23;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at 20% 10%,#372028 0,transparent 52%),var(--bg);
+  font: 16px/1.5 system-ui,sans-serif;
+  color: #f9f5ef;
+}
+
+
+/* 2. STRUTTURA DELLA PAGINA, MENU E TITOLI */
+header,main,footer {
+  max-width: 1240px;
+  margin: auto;
+  padding: 24px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ffffff15;
+}
+
+.brand {
+  font-weight: 900;
+  letter-spacing: -1px;
+  font-size: 23px;
+}
+
+.brand span {
+  color: var(--red);
+}
+
+.tag {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+h1 {
+  font-size: clamp(35px,5vw,64px);
+  letter-spacing: -2.5px;
+  line-height: 1.09;
+  margin: 20px 0 15px;
+}
+
+h1 em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+/* Titoli descrittivi delle due ruote (più lunghi dei vecchi slogan). */
+#headline {
+  font-size: clamp(30px,3.4vw,46px);
+  letter-spacing: -1.5px;
+  line-height: 1.17;
+  margin: 8px 0 15px;
+  text-wrap: balance;
+}
+
+.intro {
+  color: var(--muted);
+  max-width: 520px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  font-weight: 750;
+}
+
+
+/* 3. PULSANTI, CAMPI E CONTROLLI */
+.tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+
+.tabs button {
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+.tabs button[aria-selected=true] {
+  background: var(--gold);
+  color: #21180e;
+  border-color: var(--gold);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap: 36px;
+  align-items: center;
+  padding: 20px 0 38px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  margin: 26px 0 18px;
+  flex-wrap: wrap;
+}
+
+label {
+  font-size: 12px;
+  color: var(--muted);
+  display: grid;
+  gap: 7px;
+}
+
+select,input,textarea,button {
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: var(--panel);
+  color: white;
+}
+
+input,textarea {
+  width: 100%;
+}
+
+textarea {
+  min-height: 185px;
+  resize: vertical;
+}
+
+button {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible,a:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--red);
+  color: #1b1010;
+  border-color: var(--red);
+  padding: 16px 28px;
+  font-size: 17px;
+  width: 100%;
+}
+
+.secondary {
+  background: var(--panel2);
+}
+
+.small {
+  padding: 9px 12px;
+  font-size: 13px;
+}
+
+.caption {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.center {
+  text-align: center;
+}
+
+.error {
+  color: #ff9e91 !important;
+}
+
+.helper {
+  margin-top: 18px;
+}
+
+.status {
+  color: var(--muted);
+  font-size: 13px;
+  min-height: 1.4em;
+}
+
+
+/* 4. RULLO DELLA SLOT */
+.reelbox {
+  max-width: 470px;
+  width: 100%;
+  margin: auto;
+  padding: 24px;
+  border-radius: 24px;
+  background: linear-gradient(135deg,#39303c,#171923 64%);
+  border: 2px solid #f0d6aa7d;
+  box-shadow: 0 20px 45px #0008;
+  position: relative;
+}
+
+.reel-head {
+  font-weight: 850;
+  font-size: 12px;
+  text-align: center;
+  color: var(--gold);
+  letter-spacing: 3px;
+  margin: 0 0 13px;
+}
+
+.reel-viewport {
+  height: 310px;
+  overflow: hidden;
+  position: relative;
+  background: #11131b;
+  border-radius: 14px;
+  border: 1px solid #ffffff30;
+  box-shadow: inset 0 0 32px #0009;
+}
+
+.reel-viewport:before,.reel-viewport:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 55px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.reel-viewport:before {
+  top: 0;
+  background: linear-gradient(#11131b,transparent);
+}
+
+.reel-viewport:after {
+  bottom: 0;
+  background: linear-gradient(transparent,#11131b);
+}
+
+.reel-strip {
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.reel-item {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  text-align: center;
+  border-bottom: 1px solid #ffffff10;
+  font-size: clamp(13px,1.6vw,17px);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reel-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reel-target {
+  position: absolute;
+  top: 124px;
+  left: 0;
+  right: 0;
+  height: 62px;
+  border-top: 2px solid var(--gold);
+  border-bottom: 2px solid var(--gold);
+  background: #ffd38b18;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.reel-target:before,.reel-target:after {
+  content: "";
+  position: absolute;
+  top: 21px;
+  border: 9px solid transparent;
+}
+
+.reel-target:before {
+  left: -1px;
+  border-left-color: var(--gold);
+}
+
+.reel-target:after {
+  right: -1px;
+  border-right-color: var(--gold);
+}
+
+.actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.actions>* {
+  flex-shrink: 0;
+}
+
+
+/* 5. RISULTATI E CARTE */
+.result {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--panel);
+  padding: 26px;
+  margin-bottom: 18px;
+}
+
+.resulthead {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+h2 {
+  font-size: 28px;
+  letter-spacing: -1px;
+  margin: 6px 0;
+}
+
+#stats {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.download {
+  background: var(--gold);
+  color: #22180e;
+  border: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10,minmax(0,1fr));
+  gap: 8px;
+}
+
+.card {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  text-align: center;
+  overflow: hidden;
+}
+
+.card img {
+  width: 100%;
+  display: block;
+  border-radius: 5px;
+  aspect-ratio: 421/614;
+  object-fit: cover;
+  background: #302832;
+}
+
+.fallback {
+  font-size: 12px;
+  display: grid;
+  place-content: center;
+  aspect-ratio: 421/614;
+  background: #453c42;
+  border: 1px solid #b69772;
+  border-radius: 5px;
+  overflow-wrap: anywhere;
+  padding: 6px;
+}
+
+.card-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 1px 10px;
+  font-weight: 650;
+  font-size: 11px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-en {
+  color: var(--muted);
+  font-weight: 450;
+}
+
+.card:hover .card-label {
+  color: var(--gold);
+}
+
+h3 {
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin: 25px 0 12px;
+  color: var(--muted);
+}
+
+
+/* 6. NAVIGAZIONE ED ELENCO MAZZI */
+.header-links {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.header-links button {
+  padding: 8px 12px;
+  font-size: 13px;
+  background: transparent;
+}
+
+.header-links button[aria-current=page] {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.browse-intro {
+  max-width: 760px;
+  margin-top: 35px;
+}
+
+.game-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 22px 0;
+}
+
+.game-buttons button {
+  background: var(--panel2);
+  font-size: 14px;
+}
+
+.game-buttons button[aria-pressed=true] {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #22180e;
+}
+
+.browse-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.browse-toolbar label {
+  flex: 1;
+  min-width: min(100%,290px);
+}
+
+.browse-list {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 10px;
+}
+
+.browse-entry {
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 14px 16px;
+}
+
+.browse-entry .deck-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.browse-entry .deck-state {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.browse-entry:hover {
+  border-color: var(--gold);
+}
+
+.browse-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 25px 0;
+}
+
+.browse-pagination button {
+  font-size: 13px;
+}
+
+.browse-empty {
+  padding: 26px;
+  text-align: center;
+  color: var(--muted);
+}
+
+
+/* 7. MODALITÀ PERSONALIZZATA */
+.custom-input {
+  margin: 24px 0 16px;
+  max-width: 520px;
+}
+
+.custom-input textarea {
+  margin: 0 0 5px;
+}
+
+.custom-result {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.custom-result h2 {
+  color: var(--gold);
+  overflow-wrap: anywhere;
+  font-size: clamp(24px,4vw,36px);
+}
+
+
+/* 8. PIEDE PAGINA E FINESTRE DI DIALOGO */
+footer {
+  font-size: 12px;
+  color: var(--muted);
+  padding-top: 30px;
+  padding-bottom: 40px;
+}
+
+footer a {
+  color: var(--gold);
+}
+
+dialog {
+  width: min(720px,94vw);
+  max-height: 90vh;
+  overflow: auto;
+  border: 1px solid #ffffff30;
+  border-radius: 16px;
+  background: #181a23;
+  padding: 20px;
+  color: white;
+}
+
+dialog::backdrop {
+  background: #000c;
+}
+
+dialog .modalhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 14px;
+}
+
+dialog h2 {
+  margin: 0;
+  font-size: 23px;
+}
+
+dialog img {
+  display: block;
+  max-height: 68vh;
+  max-width: 100%;
+  margin: 12px auto;
+}
+
+dialog .modalhead button {
+  font-size: 13px;
+}
+
+
+/* 9. GESTIONE ED ESCLUSIONE DEI MAZZI */
+.manage-list {
+  max-height: 52vh;
+  overflow-y: auto;
+  display: grid;
+  gap: 6px;
+  margin: 16px 0;
+}
+
+.manage-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 9px;
+  background: var(--panel2);
+  font-size: 14px;
+}
+
+.manage-row input {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--gold);
+  flex-shrink: 0;
+}
+
+.manage-row .name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.manage-row .state {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#empty {
+  text-align: center;
+  padding: 40px 15px;
+  color: var(--muted);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+
+/* 10. VERSIONE MOBILE: modifiche per schermi piccoli */
+@media (max-width:800px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .reelbox {
+    max-width: 490px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(4,minmax(0,1fr));
+  }
+
+}
+
+@media (max-width:540px) {
+  .browse-list {
+    grid-template-columns: 1fr;
+  }
+
+  .browse-entry {
+    padding: 12px;
+  }
+
+  .header-links button {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  header,main,footer {
+    padding: 17px;
+  }
+
+  .tag {
+    display: none;
+  }
+
+  .result {
+    padding: 16px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 8px;
+  }
+
+  .card-label {
+    font-size: 10px;
+  }
+
+  .download {
+    width: 100%;
+  }
+
+  .resulthead .actions {
+    width: 100%;
+  }
+
+  .resulthead .actions button {
+    flex: 1;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  .reelbox {
+    padding: 15px;
+  }
+
+  .reel-item {
+    font-size: 14px;
+  }
+
+  .tabs button {
+    flex: 1;
+    padding: 10px;
+  }
+
+  .controls select {
+    max-width: calc(100vw - 36px);
+  }
+
+}
+

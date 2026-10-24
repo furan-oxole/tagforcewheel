@@ -1,121 +1,219 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Estrai un mazzo Yu-Gi-Oh! Tag Force, oppure usa una lista personalizzata.">
-  <title>Tag Force Wheel</title>
-  <style>
-    :root{color-scheme:dark;--bg:#111219;--panel:#1b1d28;--panel2:#242735;--muted:#adb0c2;--red:#ff654d;--gold:#ffd38b;--line:#ffffff23}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 20% 10%,#372028 0,transparent 52%),var(--bg);font:16px/1.5 system-ui,sans-serif;color:#f9f5ef}
-    header,main,footer{max-width:1240px;margin:auto;padding:24px}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff15}.brand{font-weight:900;letter-spacing:-1px;font-size:23px}.brand span{color:var(--red)}.tag{font-size:11px;letter-spacing:2px;color:var(--muted)}
-    h1{font-size:clamp(35px,5vw,64px);letter-spacing:-2.5px;line-height:1.09;margin:20px 0 15px}h1 em{color:var(--gold);font-style:normal}.intro{color:var(--muted);max-width:520px}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:750}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:26px}.tabs button{background:transparent;border:1px solid var(--line)}.tabs button[aria-selected=true]{background:var(--gold);color:#21180e;border-color:var(--gold)}
-    .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px;align-items:center;padding:20px 0 38px}.controls{display:flex;gap:12px;align-items:end;margin:26px 0 18px;flex-wrap:wrap}label{font-size:12px;color:var(--muted);display:grid;gap:7px}
-    select,input,textarea,button{font:inherit;border:1px solid var(--line);border-radius:10px;padding:12px 16px;background:var(--panel);color:white}input,textarea{width:100%}textarea{min-height:185px;resize:vertical}button{cursor:pointer;font-weight:700}button:hover:not(:disabled){filter:brightness(1.12)}button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}button:disabled{opacity:.55;cursor:not-allowed}
-    .primary{background:var(--red);color:#1b1010;border-color:var(--red);padding:16px 28px;font-size:17px;width:100%}.secondary{background:var(--panel2)}.small{padding:9px 12px;font-size:13px}.caption{color:var(--muted);font-size:13px}.center{text-align:center}.error{color:#ff9e91!important}.helper{margin-top:18px}.status{color:var(--muted);font-size:13px;min-height:1.4em}
-    .reelbox{max-width:470px;width:100%;margin:auto;padding:24px;border-radius:24px;background:linear-gradient(135deg,#39303c,#171923 64%);border:2px solid #f0d6aa7d;box-shadow:0 20px 45px #0008;position:relative}.reel-head{font-weight:850;font-size:12px;text-align:center;color:var(--gold);letter-spacing:3px;margin:0 0 13px}
-    .reel-viewport{height:310px;overflow:hidden;position:relative;background:#11131b;border-radius:14px;border:1px solid #ffffff30;box-shadow:inset 0 0 32px #0009}.reel-viewport:before,.reel-viewport:after{content:"";position:absolute;left:0;right:0;height:55px;z-index:3;pointer-events:none}.reel-viewport:before{top:0;background:linear-gradient(#11131b,transparent)}.reel-viewport:after{bottom:0;background:linear-gradient(transparent,#11131b)}
-    .reel-strip{transform:translateY(0);will-change:transform}.reel-item{height:62px;display:flex;align-items:center;justify-content:center;padding:0 16px;text-align:center;border-bottom:1px solid #ffffff10;font-size:clamp(13px,1.6vw,17px);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reel-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .reel-target{position:absolute;top:124px;left:0;right:0;height:62px;border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);background:#ffd38b18;pointer-events:none;z-index:2}.reel-target:before,.reel-target:after{content:"";position:absolute;top:21px;border:9px solid transparent}.reel-target:before{left:-1px;border-left-color:var(--gold)}.reel-target:after{right:-1px;border-right-color:var(--gold)}
-    .reel-foot{text-align:center;margin-top:13px;font-size:12px;letter-spacing:2px;color:var(--muted)}.actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.actions>*{flex-shrink:0}
-    .result{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:26px;margin-bottom:18px}.resulthead{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}h2{font-size:28px;letter-spacing:-1px;margin:6px 0}#stats{color:var(--muted);font-size:14px}.download{background:var(--gold);color:#22180e;border:0}.hint{color:var(--muted);font-size:13px;margin:22px 0}
-    .grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px}.card{padding:0;border:0;background:transparent;border-radius:7px;display:flex;flex-direction:column;align-items:stretch;min-width:0;text-align:center;overflow:hidden}.card img{width:100%;display:block;border-radius:5px;aspect-ratio:421/614;object-fit:cover;background:#302832}.fallback{font-size:12px;display:grid;place-content:center;aspect-ratio:421/614;background:#453c42;border:1px solid #b69772;border-radius:5px;overflow-wrap:anywhere;padding:6px}.card-label{display:flex;flex-direction:column;gap:2px;padding:5px 1px 10px;font-weight:650;font-size:11px;line-height:1.25;overflow-wrap:anywhere}.card-en{color:var(--muted);font-weight:450}.card:hover .card-label{color:var(--gold)}h3{font-size:12px;letter-spacing:2px;margin:25px 0 12px;color:var(--muted)}
-    .header-links{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.header-links button{padding:8px 12px;font-size:13px;background:transparent}.header-links button[aria-current=page]{color:var(--gold);border-color:var(--gold)}
-    .browse-intro{max-width:760px;margin-top:35px}.game-buttons{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0}.game-buttons button{background:var(--panel2);font-size:14px}.game-buttons button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#22180e}
-    .browse-toolbar{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:20px 0;flex-wrap:wrap}.browse-toolbar label{flex:1;min-width:min(100%,290px)}.browse-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.browse-entry{text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;background:var(--panel);border:1px solid var(--line);padding:14px 16px}.browse-entry .deck-title{min-width:0;overflow-wrap:anywhere}.browse-entry .deck-state{font-size:11px;color:var(--muted);white-space:nowrap}.browse-entry:hover{border-color:var(--gold)}.browse-pagination{display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;padding:25px 0}.browse-pagination button{font-size:13px}.browse-empty{padding:26px;text-align:center;color:var(--muted)}
-    .custom-input{margin:24px 0 16px;max-width:520px}.custom-input textarea{margin:0 0 5px}.custom-result{text-align:center;padding:30px 20px}.custom-result h2{color:var(--gold);overflow-wrap:anywhere;font-size:clamp(24px,4vw,36px)}
-    footer{font-size:12px;color:var(--muted);padding-top:30px;padding-bottom:40px}footer a{color:var(--gold)}
-    dialog{width:min(720px,94vw);max-height:90vh;overflow:auto;border:1px solid #ffffff30;border-radius:16px;background:#181a23;padding:20px;color:white}dialog::backdrop{background:#000c}dialog .modalhead{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:14px}dialog h2{margin:0;font-size:23px}dialog img{display:block;max-height:68vh;max-width:100%;margin:12px auto}dialog .modalhead button{font-size:13px}
-    .manage-list{max-height:52vh;overflow-y:auto;display:grid;gap:6px;margin:16px 0}.manage-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:9px;background:var(--panel2);font-size:14px}.manage-row input{width:19px;height:19px;accent-color:var(--gold);flex-shrink:0}.manage-row .name{flex:1;min-width:0;overflow-wrap:anywhere}.manage-row .state{color:var(--muted);font-size:12px}#empty{text-align:center;padding:40px 15px;color:var(--muted)}[hidden]{display:none!important}
-    @media(max-width:800px){.layout{grid-template-columns:1fr;gap:24px}.reelbox{max-width:490px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-    @media(max-width:540px){.browse-list{grid-template-columns:1fr}.browse-entry{padding:12px}.header-links button{padding:8px;font-size:12px}header,main,footer{padding:17px}.tag{display:none}.result{padding:16px}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.card-label{font-size:10px}.download{width:100%}.resulthead .actions{width:100%}.resulthead .actions button{flex:1}h2{font-size:24px}.reelbox{padding:15px}.reel-item{font-size:14px}.tabs button{flex:1;padding:10px}.controls select{max-width:calc(100vw - 36px)}}
-  </style>
-</head>
-<body>
-<header><div class="brand">TAG FORCE <span>WHEEL</span></div><nav class="header-links" aria-label="Navigazione principale"><button type="button" id="nav-home" aria-current="page">Home</button><button type="button" id="nav-browse">Elenco Mazzi</button></nav></header>
-<main>
- <div id="home-page">
-  <nav class="tabs" aria-label="Modalità ruota">
-    <button id="tab-main" aria-selected="true" type="button">Tag Force</button>
-    <button id="tab-custom" aria-selected="false" type="button">Ruota personalizzata</button>
-  </nav>
-  <section class="layout">
-    <div>
-      <div class="eyebrow" id="mode-heading">YU-GI-OH! · DECK RANDOMIZER</div>
-      <h1 id="headline">Il tuo prossimo<br>mazzo? <em>Gira la slot.</em></h1>
-      <p class="intro" id="introduction">Estrai un mazzo dai giochi Tag Force, guarda le carte e scarica la ricetta.</p>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="Estrai un mazzo Yu-Gi-Oh! Tag Force, oppure usa una lista personalizzata." name="description"/>
+  <title>
+   Tag Force Wheel
+  </title>
+  <!-- Aspetto del sito: colori, spaziature, ruota, carte e versione mobile -->
+  <link href="stile.css?v=2" rel="stylesheet"/>
+ </head>
+ <body>
+  <!-- TESTATA: logo e navigazione -->
+  <header>
+   <div class="brand">
+    TAG FORCE
+    <span>
+     WHEEL
+    </span>
+   </div>
+   <nav aria-label="Navigazione principale" class="header-links">
+    <button aria-current="page" id="nav-home" type="button">
+     Home
+    </button>
+    <button id="nav-browse" type="button">
+     Elenco Mazzi
+    </button>
+   </nav>
+  </header>
+  <main>
+   <!-- HOME: modalita, slot ed estrazione -->
+   <div id="home-page">
+    <nav aria-label="Modalit&agrave; ruota" class="tabs">
+     <button aria-selected="true" id="tab-main" type="button">
+      Ruota Tag Force
+     </button>
+     <button aria-selected="false" id="tab-custom" type="button">
+      Ruota personalizzata
+     </button>
+    </nav>
+    <section class="layout">
+     <div>
+      <h1 id="headline">
+      </h1>
       <div id="main-controls">
-        <div class="controls">
-          <label>GIOCO<select id="game" disabled><option>Caricamento...</option></select></label>
-          <button type="button" class="secondary small" id="manage">Gestisci mazzi</button>
-          <span class="eyebrow" id="count"></span>
-        </div>
-      </div>
-      <div id="custom-controls" hidden>
-        <label class="custom-input">ELEMENTI DELLA LISTA (UNO PER RIGA)
-          <textarea id="custom-list" spellcheck="false" placeholder="Mazzo Drago Bianco&#10;Mazzo Zombie&#10;Mazzo Cyber Drago"></textarea>
-          <span class="caption" id="custom-count">0 elementi · La lista viene salvata automaticamente in questo browser.</span>
+       <div class="controls">
+        <label>
+         GIOCO
+         <select disabled="" id="game">
+          <option>
+           Caricamento...
+          </option>
+         </select>
         </label>
+        <button class="secondary small" id="manage" type="button">
+         Gestisci mazzi
+        </button>
+        <span class="eyebrow" id="count">
+        </span>
+       </div>
       </div>
-      <button class="primary" id="spin" disabled>Caricamento mazzi...</button>
-      <p class="caption center" id="caption">Ogni elemento disponibile ha la stessa probabilità.</p>
-      <p id="status" class="status" role="status" aria-live="polite"></p>
-    </div>
-    <div>
-      <div class="reelbox" aria-label="Slot a un rullo verticale">
-        <p class="reel-head" id="reel-head">TAG FORCE</p>
-        <div class="reel-viewport"><div class="reel-strip" id="reel"></div><div class="reel-target"></div></div>
-        <div class="reel-foot">5 NOMI VISIBILI · 50 POSIZIONI PER GIRO</div>
+      <div hidden="" id="custom-controls">
+       <label class="custom-input">
+        ELEMENTI DELLA LISTA (UNO PER RIGA)
+        <textarea id="custom-list" placeholder="Mazzo Drago Bianco
+Mazzo Zombie
+Mazzo Cyber Drago" spellcheck="false"></textarea>
+        <span class="caption" id="custom-count">
+         0 elementi &middot; La lista viene salvata automaticamente in questo browser.
+        </span>
+       </label>
       </div>
-    </div>
-  </section>
-  <section class="result" id="main-result" aria-label="Mazzo estratto">
-    <div id="empty">Seleziona un gioco e premi GIRA, oppure apri un mazzo dalla pagina Elenco Mazzi.</div>
-    <div id="chosen" hidden>
+      <button class="primary" disabled="" id="spin">
+       Caricamento mazzi...
+      </button>
+      <p aria-live="polite" class="status" id="status" role="status">
+      </p>
+     </div>
+     <div>
+      <div aria-label="Slot a un rullo verticale" class="reelbox">
+       <p class="reel-head" id="reel-head">
+        TAG FORCE
+       </p>
+       <div class="reel-viewport">
+        <div class="reel-strip" id="reel">
+        </div>
+        <div class="reel-target">
+        </div>
+       </div>
+      </div>
+     </div>
+    </section>
+    <section aria-label="Mazzo estratto" class="result" id="main-result">
+     <div id="empty">
+      Seleziona un gioco e premi GIRA, oppure apri un mazzo dalla pagina Elenco Mazzi.
+     </div>
+     <div hidden="" id="chosen">
       <div class="resulthead">
-        <div><div class="eyebrow" id="resultLabel">IL TUO MAZZO</div><h2 id="deckname"></h2><div id="stats"></div></div>
-        <div class="actions"><button type="button" id="exclude-selected" class="secondary small">Escludi mazzo</button><button type="button" class="download" id="download">↓ Scarica .ydk</button></div>
+       <div>
+         <h2 id="deckname">
+        </h2>
+        <div id="stats">
+        </div>
+       </div>
+       <div class="actions">
+        <button class="secondary small" id="exclude-selected" type="button">
+         Escludi mazzo
+        </button>
+        <button class="download" id="download" type="button">
+         &darr; Scarica .ydk
+        </button>
+       </div>
       </div>
-      <p class="hint">Tocca una carta per ingrandirla. Sotto ogni carta trovi il nome italiano e quello inglese, quando disponibili. Le copie rimangono separate.</p>
-      <div id="cards"></div>
+      <div id="cards">
+      </div>
+     </div>
+    </section>
+    <section aria-live="polite" class="result custom-result" hidden="" id="custom-result">
+     <div class="eyebrow" id="custom-result-label">
+      ELEMENTO ESTRATTO
+     </div>
+     <h2 id="custom-choice">
+      Gira la ruota per scoprire quale elemento verrà estratto!
+     </h2>
+    </section>
+    <p aria-live="polite" class="status" id="announce" role="status">
+    </p>
+   </div>
+   <!-- ARCHIVIO: elenco e ricerca dei mazzi -->
+   <section aria-label="Elenco Mazzi" hidden="" id="browse-page">
+    <div class="browse-intro">
+     <div class="eyebrow">
+      ARCHIVIO DEI MAZZI
+     </div>
+     <h1>
+      Elenco
+      <em>
+       Mazzi.
+      </em>
+     </h1>
+     <p class="intro" id="browse-intro">
+     </p>
     </div>
-  </section>
-  <section class="result custom-result" id="custom-result" hidden aria-live="polite">
-    <div class="eyebrow" id="custom-result-label">ELEMENTO ESTRATTO</div>
-    <h2 id="custom-choice">Inserisci almeno un nome per iniziare.</h2>
-  </section>
-  <p id="announce" class="status" role="status" aria-live="polite"></p>
- </div>
- <section id="browse-page" aria-label="Elenco Mazzi" hidden>
-  <div class="browse-intro">
-   <div class="eyebrow">ARCHIVIO DEI MAZZI</div>
-   <h1>Elenco <em>Mazzi.</em></h1>
-   <p class="intro">Seleziona il gioco e cerca il mazzo che vuoi visualizzare. Sono mostrati 50 mazzi per pagina.</p>
-  </div>
-  <div id="browse-games" class="game-buttons" aria-label="Seleziona un gioco"></div>
-  <div class="browse-toolbar">
-   <label>CERCA UN MAZZO<input type="search" id="browse-search" placeholder="Scrivi il nome del mazzo..." autocomplete="off"></label>
-   <span id="browse-count" class="caption" aria-live="polite"></span>
-  </div>
-  <div id="browse-list" class="browse-list" aria-label="Mazzi del gioco selezionato"></div>
-  <nav class="browse-pagination" aria-label="Pagine dell'elenco">
-    <button id="browse-prev" type="button" class="secondary small">← 50 precedenti</button>
-    <span id="browse-page-info" class="caption" aria-live="polite"></span>
-    <button id="browse-next" type="button" class="secondary small">50 successivi →</button>
-  </nav>
- </section>
-</main>
-<footer>Progetto fan non ufficiale. Yu-Gi-Oh! e le immagini delle carte appartengono ai rispettivi titolari. Le immagini delle carte vengono cercate esclusivamente nella cartella locale <code>Carte/</code> del repository. Finché la cartella non sarà riempita, appariranno segnaposto. I file .ydk sono letti dal repository GitHub pubblico.</footer>
-<dialog id="zoom"><div class="modalhead"><strong>Dettaglio carta</strong><button type="button" id="close">Chiudi ✕</button></div><img id="big" alt=""><p id="cardname" class="center"></p></dialog>
-<dialog id="manage-dialog" aria-labelledby="manage-title">
-  <div class="modalhead"><h2 id="manage-title">Gestisci mazzi</h2><button type="button" id="close-manage">Chiudi ✕</button></div>
-  <p class="caption">Deseleziona un mazzo per escluderlo dalle estrazioni. Puoi ripristinarlo in qualsiasi momento.</p>
-  <input type="search" id="manage-search" placeholder="Cerca per nome..." aria-label="Cerca un mazzo">
-  <p class="caption" id="manage-count"></p>
-  <div id="manage-list" class="manage-list"></div>
-  <button type="button" class="secondary small" id="restore-all">Ripristina tutti i mazzi</button>
-</dialog>
-<script src="app.js?v=4" defer></script>
-</body>
+    <div aria-label="Seleziona un gioco" class="game-buttons" id="browse-games">
+    </div>
+    <div class="browse-toolbar">
+     <label>
+      CERCA UN MAZZO
+      <input autocomplete="off" id="browse-search" placeholder="Scrivi il nome del mazzo..." type="search"/>
+     </label>
+     <span aria-live="polite" class="caption" id="browse-count">
+     </span>
+    </div>
+    <div aria-label="Mazzi del gioco selezionato" class="browse-list" id="browse-list">
+    </div>
+    <nav aria-label="Pagine dell'elenco" class="browse-pagination">
+     <button class="secondary small" id="browse-prev" type="button">
+      &larr; Precedenti
+     </button>
+     <span aria-live="polite" class="caption" id="browse-page-info">
+     </span>
+     <button class="secondary small" id="browse-next" type="button">
+      Successivi &rarr;
+     </button>
+    </nav>
+   </section>
+  </main>
+  <!-- PIEDE DI PAGINA -->
+  <footer>
+   Progetto fan non ufficiale. Yu-Gi-Oh! e le immagini delle carte appartengono ai rispettivi titolari. Le immagini delle carte vengono cercate esclusivamente nella cartella locale
+   <code>
+    Carte/
+   </code>
+   del repository. Finch&eacute; la cartella non sar&agrave; riempita, appariranno segnaposto. I file .ydk sono letti dal repository GitHub pubblico.
+  </footer>
+  <!-- FINESTRE: dettaglio carte e gestione esclusioni -->
+  <dialog id="zoom">
+   <div class="modalhead">
+    <strong>
+     Dettaglio carta
+    </strong>
+    <button id="close" type="button">
+     Chiudi ✕
+    </button>
+   </div>
+   <img alt="" id="big"/>
+   <p class="center" id="cardname">
+   </p>
+  </dialog>
+  <dialog aria-labelledby="manage-title" id="manage-dialog">
+   <div class="modalhead">
+    <h2 id="manage-title">
+     Gestisci mazzi
+    </h2>
+    <button id="close-manage" type="button">
+     Chiudi ✕
+    </button>
+   </div>
+   <p class="caption">
+    Deseleziona un mazzo per escluderlo dalle estrazioni. Puoi ripristinarlo in qualsiasi momento.
+   </p>
+   <input aria-label="Cerca un mazzo" id="manage-search" placeholder="Cerca per nome..." type="search"/>
+   <p class="caption" id="manage-count">
+   </p>
+   <div class="manage-list" id="manage-list">
+   </div>
+   <button class="secondary small" id="restore-all" type="button">
+    Ripristina tutti i mazzi
+   </button>
+  </dialog>
+  <!-- Testi modificabili: apri testi.js. App: funzioni del sito. -->
+  <script defer="" src="testi.js?v=2">
+  </script>
+  <script defer="" src="app.js?v=6">
+  </script>
+ </body>
 </html>
+
