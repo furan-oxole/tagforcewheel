@@ -204,7 +204,7 @@ function openBrowseDeck(d) {
     if (mode !== 'main')
         setMode('main');
     setPage('home');
-    showDeck(d, false);
+    showDeck(d);
     $('main-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 $('nav-home').onclick = () => setPage('home');
@@ -249,7 +249,6 @@ function setMode(next) {
     $('custom-result').hidden = !custom;
     aggiornaTestiModalita();
     $('status').textContent = '';
-    $('announce').textContent = '';
     rebuildReel();
 }
 function canChange() { return !spinning; }
@@ -282,7 +281,6 @@ function spin() {
     $('tab-main').disabled = true;
     $('tab-custom').disabled = true;
     setStatus('');
-    $('announce').textContent = '';
     const pool = shuffled(list);
     // Keep the five current labels on screen. New randomized labels enter from below as scrolling starts.
     const rows = [...visible, ...Array.from({ length: SPIN_STEPS + 3 }, (_, i) => pool[i % pool.length])];
@@ -302,10 +300,9 @@ function spin() {
         if (mode === 'custom') {
             $('custom-result-label').textContent = 'ELEMENTO ESTRATTO';
             $('custom-choice').textContent = winner.name;
-            $('announce').textContent = `Elemento estratto: ${winner.name}`;
         }
         else {
-            showDeck(winner, true);
+            showDeck(winner);
         }
         updateCount();
     };
@@ -435,7 +432,7 @@ function refreshZoomName(id) {
 }
 
 // 9. VISUALIZZAZIONE DEI MAZZI E DELLE CARTE
-async function showDeck(d, random = false) {
+async function showDeck(d) {
     if (!d || mode !== 'main')
         return;
     selected = d;
@@ -496,7 +493,6 @@ async function showDeck(d, random = false) {
             $('cards').append(grid);
         }
         $('download').disabled = false;
-        $('announce').textContent = `Mazzo ${random ? 'estratto' : 'selezionato'}: ${d.name}`;
         // Metadata is optional: the deck remains functional if the translation service is offline.
         hydrateCardNames(labels);
     }
@@ -659,7 +655,8 @@ async function init() {
         setGame(ordered[0]);
         browseGame = ordered[0];
         renderBrowse();
-        setStatus(`Caricati ${entries.length} mazzi da ${ordered.length} giochi.`);
+        // Nascondiamo il riepilogo iniziale; manteniamo visibili gli avvisi e gli errori.
+        if (!tree.truncated) setStatus('');
     }
     catch (err) {
         setStatus(err.message, true);
